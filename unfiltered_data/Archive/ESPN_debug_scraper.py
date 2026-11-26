@@ -7,8 +7,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
+import os
+import sys
 import time
 import getpass
+
+LEAGUE_ID = os.environ.get("ESPN_LEAGUE_ID")
+if not LEAGUE_ID:
+    sys.exit("Set ESPN_LEAGUE_ID (see .env.example).")
 
 def debug_espn_login():
     """
@@ -17,8 +23,8 @@ def debug_espn_login():
     print("=== ESPN Debug Scraper ===")
     
     # Get credentials
-    username = input("Enter your ESPN username/email: ")
-    password = getpass.getpass("Enter your ESPN password (hidden): ")
+    username = os.environ.get("ESPN_USERNAME") or input("Enter your ESPN username/email: ")
+    password = os.environ.get("ESPN_PASSWORD") or getpass.getpass("Enter your ESPN password (hidden): ")
     
     # Set up Chrome options (visible browser for debugging)
     chrome_options = Options()
@@ -146,7 +152,7 @@ def debug_espn_login():
             
             # Navigate to league page
             print("🏈 Step 6: Going to your league page...")
-            driver.get("https://fantasy.espn.com/football/players/projections?leagueId=1555307944")
+            driver.get(f"https://fantasy.espn.com/football/players/projections?leagueId={LEAGUE_ID}")
             time.sleep(8)
         
         print(f"\n📊 Step 7: Analyzing league page...")

@@ -1,6 +1,6 @@
-#README
+# Project notes
 
-This is a README file for the project.
+Working notes and roadmap. See [README.md](README.md) for the project overview and how to run it.
 
 Plan:
 - Grab ESPN projections for the 2025 season.

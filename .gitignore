@@ -1,5 +1,17 @@
+# Python
 FF_strat_venv/
+.venv/
 __pycache__/
 *.py[cod]
+
+# Local config / secrets
 .env
-.venv/
+
+# Scraper outputs
+espn_projections.csv
+espn_table_*.csv
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

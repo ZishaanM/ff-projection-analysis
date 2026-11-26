@@ -1,3 +1,6 @@
+import os
+import sys
+
 import pandas as pd
 import requests
 from selenium import webdriver
@@ -10,8 +13,11 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import getpass
 
-# ESPN League URL
-link = "https://fantasy.espn.com/football/players/projections?leagueId=1555307944"
+LEAGUE_ID = os.environ.get("ESPN_LEAGUE_ID")
+if not LEAGUE_ID:
+    sys.exit("Set ESPN_LEAGUE_ID (see .env.example).")
+
+link = f"https://fantasy.espn.com/football/players/projections?leagueId={LEAGUE_ID}"
 
 def scrape_espn_with_login():
     """
@@ -162,8 +168,7 @@ def try_espn_api_approach():
     """
     print("=== Trying ESPN API Approach ===")
     
-    # Extract league ID from URL
-    league_id = "1555307944"
+    league_id = LEAGUE_ID
     
     # Common ESPN API endpoints
     api_urls = [
