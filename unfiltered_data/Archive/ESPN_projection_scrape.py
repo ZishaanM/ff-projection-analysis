@@ -1,6 +1,22 @@
-import pandas as pd
+import os
+import sys
+import time
 
-link = "https://fantasy.espn.com/football/players/projections?leagueId=1555307944"
+import pandas as pd
+import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+
+LEAGUE_ID = os.environ.get("ESPN_LEAGUE_ID")
+if not LEAGUE_ID:
+    sys.exit("Set ESPN_LEAGUE_ID (see .env.example).")
+
+link = f"https://fantasy.espn.com/football/players/projections?leagueId={LEAGUE_ID}"
 
 def scrape_espn_with_selenium():
     # Set up Chrome options
