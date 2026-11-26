@@ -1,20 +1,20 @@
 # ff-projection-analysis
 
-An analysis of how ESPN's 2025 preseason fantasy football projections compare to actual end-of-season points, broken down by position. Work in progress.
+A small personal project comparing ESPN's 2025 preseason fantasy football projections to how players actually scored, by position. Still a work in progress.
 
 **For reviewers:** Python · pandas · matplotlib · solo
 
 ## Problem
 
-Preseason projections drive most fantasy drafts, but they often miss badly. Before testing which draft strategies hold up, I want to know how far off the projections are and whether that error differs by position (QB, RB, WR, TE). The target setting is a PPR, 10-team league with no trades or lineup changes.
+I wanted to see how far off ESPN's preseason projections were and whether some positions (QB, RB, WR, TE) are harder to project than others. Eventually I'd like to use that to test a few draft strategies in a simple PPR, 10-team league.
 
 ## Approach
 
-- **Data:** ESPN preseason ranks and projected 2025 points (`unfiltered_data/ESPN_proj_pts.csv`, with 2024 points for reference) and end-of-season 2025 ranks and points (`unfiltered_data/end_of_season_points.csv`), saved as CSVs so the analysis doesn't depend on scraping.
-- **Join:** `Scripts/merge_csv.py` strips whitespace from names, outer-joins on player name, and keeps only players with both a preseason and a postseason rank. That leaves 142 skill-position players in `Scripts/master_df.csv`.
-- **Error metric:** `Scripts/stdev_by_position.py` computes relative error, `(actual − projected) / projected`, so a 300-point QB and a 150-point TE are on the same scale, and plots one histogram per position.
-- **Tradeoff:** exact name matching is simple but lossy. Kickers, defenses, and name variants (ESPN's "James Cook" vs. "James Cook III" in the season totals) drop out of the join.
-- **Next:** finish the per-position error stats, then simulate drafts to test strategies like reaching past ADP or prioritizing one position early. The full roadmap is in [NOTES.md](NOTES.md).
+- **Data:** two CSVs in `unfiltered_data/`. `ESPN_proj_pts.csv` has preseason ranks, projected 2025 points, and 2024 points. `end_of_season_points.csv` has final 2025 ranks and points.
+- **Join:** `Scripts/merge_csv.py` matches players by name and keeps only those who appear in both files. That gives 142 players in `Scripts/master_df.csv`.
+- **Error:** `Scripts/stdev_by_position.py` calculates `(actual − projected) / projected` for each player, so positions with different point totals can be compared, and plots a histogram for each position.
+- **Tradeoff:** matching on exact names is simple but misses some players. Kickers, defenses, and name variants (for example "James Cook" vs. "James Cook III") get dropped.
+- **Next:** finish the per-position error stats, then try simulating drafts. My rough plan is in [NOTES.md](NOTES.md).
 
 ## How to run
 
@@ -64,19 +64,19 @@ git status --short master_df.csv                                            # no
 
 **Optional: archived scrapers**
 
-`unfiltered_data/Archive/` holds the scrapers used to collect data. You don't need them to reproduce the analysis. They need Google Chrome and extra packages:
+`unfiltered_data/Archive/` has my earlier attempts at collecting the data. They're rough and not needed to run the analysis. They need Google Chrome and a few extra packages:
 
 ```bash
 pip install -r requirements-scrapers.txt
 ```
 
 - `Scrape_fantasy_pros.py` reads `fantasy_pros_data.csv`, splits FantasyPros' `"Player Team (Bye)"` column into separate columns, and overwrites `fantasy_pros_data3.csv`. Run it from its own folder: `cd unfiltered_data/Archive && python Scrape_fantasy_pros.py`.
-- The `ESPN_*.py` scripts target an ESPN league projections page and need `ESPN_LEAGUE_ID` set. `ESPN_debug_scraper.py` also reads `ESPN_USERNAME` and `ESPN_PASSWORD` and prompts for them if they're unset. Copy `.env.example` to `.env`, fill it in, and load it with `set -a; source .env; set +a`. These are exploratory: `ESPN_projection_scrape_v2.py` offers an API probe or a manual browser login, and private leagues require logging in.
+- The `ESPN_*.py` scripts target an ESPN league projections page and need `ESPN_LEAGUE_ID` set. `ESPN_debug_scraper.py` also reads `ESPN_USERNAME` and `ESPN_PASSWORD` and prompts for them if they're unset. Copy `.env.example` to `.env`, fill it in, and load it with `set -a; source .env; set +a`. `ESPN_projection_scrape_v2.py` asks whether to try ESPN's API or log in manually in a browser. Private leagues need a login.
 
 ## What's interesting in the code
 
-- `Scripts/merge_csv.py`: a short script whose join and `dropna` define the dataset. Its outer join plus rank filter is where 161 projected players and 600 season finishers become 142 matched players, and where kickers, defenses, and name mismatches fall out.
-- `unfiltered_data/Archive/Scrape_fantasy_pros.py`: `split_player_team_bye` parses strings like `"Christian McCaffrey SF (9)"` by splitting from the right, which keeps multi-word names like "Amon-Ra St. Brown" intact.
+- `Scripts/merge_csv.py`: a short script, but it decides who's in the dataset. The join and `dropna` turn 161 projected players and 600 end-of-season players into 142 matches, and it's where kickers, defenses, and mismatched names get dropped.
+- `unfiltered_data/Archive/Scrape_fantasy_pros.py`: `split_player_team_bye` splits strings like `"Christian McCaffrey SF (9)"` from the right, so names with spaces like "Amon-Ra St. Brown" stay together.
 
 ## Stack
 
